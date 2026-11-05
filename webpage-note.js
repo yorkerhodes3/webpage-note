@@ -8,6 +8,11 @@
     return;
   }
   if (document.getElementById("webpage-note")) return;
+  const feedbackEmail = typeof config.feedbackEmail === "string" ? config.feedbackEmail.trim() : "";
+  const emailEnabled = /^[^\s@,;<>?&#%]+@[^\s@,;<>?&#%]+\.[^\s@,;<>?&#%]+$/.test(feedbackEmail);
+  if (config.feedbackEmail !== undefined && !emailEnabled) {
+    console.error("Webpage Note requires feedbackEmail to be a single email address. Email feedback is disabled.");
+  }
 
   const start = () => {
     if (document.getElementById("webpage-note")) return;
@@ -66,11 +71,11 @@
     input.maxLength = 4000;
     const privacy = document.createElement("p");
     privacy.className = "status";
-    privacy.textContent = "Review the captured text before sharing. URL query parameters are omitted. GitHub opens in a new tab; you must submit the issue there.";
+    privacy.textContent = "Review the captured text before sharing. URL query parameters are omitted. Submit the issue on GitHub or send the email yourself; opening a draft does not share it.";
     const issueText = document.createElement("textarea");
     issueText.readOnly = true;
     issueText.hidden = true;
-    issueText.setAttribute("aria-label", "Issue text to copy into GitHub");
+    issueText.setAttribute("aria-label", "Feedback text to copy");
     const status = document.createElement("p");
     status.className = "status";
     status.setAttribute("role", "status");
@@ -78,11 +83,14 @@
     save.textContent = "Save locally";
     const publish = document.createElement("button");
     publish.textContent = "Open GitHub issue";
+    const email = document.createElement("button");
+    email.textContent = "Send feedback by email";
+    email.hidden = !emailEnabled;
     const remove = document.createElement("button");
     remove.textContent = "Delete local note";
     const close = document.createElement("button");
     close.textContent = "Close";
-    dialog.append(heading, context, label, input, privacy, issueText, status, save, publish, remove, close);
+    dialog.append(heading, context, label, input, privacy, issueText, status, save, publish, email, remove, close);
     root.append(dialog);
 
     let current = null;
@@ -187,9 +195,8 @@
       return true;
     };
 
-    save.addEventListener("click", saveNote);
-    publish.addEventListener("click", () => {
-      if (!saveNote()) return;
+    const feedbackTitle = () => `[Website review] ${(document.title || page.pathname).slice(0, 100)}`;
+    const feedbackBody = () => {
       const metadata = JSON.stringify({
         tool: "webpage-note",
         version: 1,
@@ -198,7 +205,7 @@
         text: current.text
       }, null, 2);
       // Escape backticks so captured page content cannot close the metadata fence.
-      const body = [
+      return [
         "## Website review",
         "",
         current.comment,
@@ -211,8 +218,14 @@
         "",
         "Review this feedback and implement the requested changes in the website repository."
       ].join("\n");
+    };
+
+    save.addEventListener("click", saveNote);
+    publish.addEventListener("click", () => {
+      if (!saveNote()) return;
+      const body = feedbackBody();
       const url = new URL(`https://github.com/${config.repository}/issues/new`);
-      url.searchParams.set("title", `[Website review] ${(document.title || page.pathname).slice(0, 100)}`);
+      url.searchParams.set("title", feedbackTitle());
       url.searchParams.set("body", body);
       const needsCopy = url.href.length > 7500;
       issueText.hidden = !needsCopy;
@@ -224,6 +237,19 @@
       status.textContent = needsCopy
         ? "This note is too long for a prefilled URL. Copy the issue text field above and paste it into the GitHub issue body, then submit there."
         : "GitHub issue form opened. Submit it on GitHub to share this note; the local copy is retained.";
+    });
+    email.addEventListener("click", () => {
+      if (!emailEnabled || !saveNote()) return;
+      const body = `Repository: https://github.com/${config.repository}\n\n${feedbackBody()}`;
+      const base = `mailto:${encodeURIComponent(feedbackEmail)}?subject=${encodeURIComponent(feedbackTitle())}`;
+      const url = `${base}&body=${encodeURIComponent(body.replace(/\n/g, "\r\n"))}`;
+      const needsCopy = url.length > 1800;
+      issueText.hidden = !needsCopy;
+      if (needsCopy) issueText.value = body;
+      status.textContent = needsCopy
+        ? "This note is too long for a reliable email link. Copy the feedback text above into your email body, then send it. If no email app opens, use your mail service directly."
+        : "Email draft requested. Send it in your email app to share this note; the local copy is retained. If no email app opens, configure a mail handler or use your mail service directly.";
+      window.location.href = needsCopy ? base : url;
     });
     remove.addEventListener("click", () => {
       if (activeIndex < 0) return;

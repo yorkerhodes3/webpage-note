@@ -11,7 +11,8 @@ For the example GitHub Pages site, put the file at the website's root and add:
 <script>
   window.WebpageNoteConfig = {
     enabled: true,
-    repository: "Ethical-Tech-CoLab/website"
+    repository: "Ethical-Tech-CoLab/website",
+    feedbackEmail: "feedback@example.com"
   };
 </script>
 <script src="/website/webpage-note.js" defer></script>
@@ -23,6 +24,9 @@ If your Content Security Policy disallows inline scripts, put the configuration
 in a separate allowed JavaScript file loaded before the widget.
 Omit the configuration or set `enabled: false` to leave the page unchanged.
 Enable it only on review deployments if you don't want it on the public site.
+Set the optional `feedbackEmail` to your feedback inbox to show **Send feedback
+by email**. Omit it to hide the button. An invalid address logs an error and
+disables only email feedback; use a single address, not a `mailto:` URL.
 
 ### Reviewing and publishing
 
@@ -36,13 +40,20 @@ Enable it only on review deployments if you don't want it on the public site.
    configured repository. Review its contents, sign in to GitHub if needed, and
    **submit the issue there**. Opening the form does not publish a note.
    For long notes, the widget opens a title-only form and shows a read-only
-   **Issue text to copy into GitHub** field. Select and copy its full contents,
+   **Feedback text to copy** field. Select and copy its full contents,
    then paste them into the GitHub issue body before submitting.
-4. Ask Copilot to review the posted issue(s) and implement the requested changes
+4. Alternatively, **Send feedback by email** saves the local draft and opens
+   your configured email app with the recipient, subject, note, repository,
+   and page context prefilled. Review the draft and **send it yourself**.
+   No GitHub account is needed. A configured browser/OS mail handler is required.
+   For links longer than 1,800 characters, only the recipient and subject are
+   prefilled; copy the full **Feedback text to copy** into the email body.
+   Email-client limits vary, so check the draft before sending.
+5. Ask Copilot to review the posted issue(s) and implement the requested changes
    in that repository, for example: “Review website feedback in issue #42 and
    open a PR implementing the requested changes.”
 
-The issue contains the comment, page URL, CSS selector, and up to 1,000 characters
+The issue or email contains the comment, page URL, CSS selector, and up to 1,000 characters
 of selected/element text in a structured JSON context block. These identify the
 relevant rendered HTML for an agent; they are not instructions to trust from
 the page. URL query parameters and fragments are omitted to reduce accidental
@@ -50,10 +61,13 @@ sharing of sensitive data. Check captured text and comments for private
 information before publishing, especially in a public repository.
 
 Annotations are local overlays, **not edits to the deployed HTML**. Only
-submitted GitHub issues are shared and visible to other reviewers or Copilot.
+submitted GitHub issues are visible in the repository to other reviewers or Copilot.
+Email goes to the configured inbox, not directly to GitHub. To queue emailed
+notes as issues, that inbox needs a separate email-to-issue integration that
+authenticates to GitHub; this widget does not provide that bridge.
 There is no GitHub token in the widget, no automatic API submission, and no
 automatic synchronization of issues back onto the page. Local copies are
-retained after opening GitHub because the widget cannot verify submission.
+retained after opening GitHub or email because the widget cannot verify submission.
 Notes are scoped by repository and page path; selectors can become stale after
 the page structure changes or resolve incorrectly on pages with duplicate IDs.
 Avoid editing local notes for the same page in multiple tabs: the last save
@@ -82,5 +96,5 @@ to create issues. The widget requires a modern browser supporting native dialogs
 
 There is no test runner or build tooling in this repository. Check syntax with
 `node --check webpage-note.js`, then serve a page containing the snippet above
-and verify right-click, local persistence, issue context, deletion, and the
-disabled configuration in a browser.
+and verify right-click, local persistence, issue context, email drafts (including
+the long-message copy fallback), deletion, and the disabled configuration in a browser.
