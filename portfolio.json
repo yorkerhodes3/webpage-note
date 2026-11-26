@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "id": "webpage-note",
+  "title": "webpage-note",
+  "repo": "yorkerhodes3/webpage-note",
+  "summary": "A small opt-in JavaScript widget that lets website owners and reviewers attach notes to page elements and turn them into prefilled GitHub issues for follow-up.",
+  "kind": "tool",
+  "methodTags": [
+    "collaboration-tools",
+    "applied-ai"
+  ],
+  "domainTags": [
+    "collaboration"
+  ],
+  "contribution": {
+    "date": "2026-10-31",
+    "role": "built",
+    "credits": []
+  },
+  "narrative": {
+    "problem": "Website owners and reviewers lack a common way to leave feedback tied to the exact element they mean: a feedback issue form can ask for a URL and a screenshot, but it cannot attach a comment to an individual part of the page.",
+    "decision": "Ships as one dependency-free script, off unless configured, that keeps notes locally and opens a prefilled GitHub issue with the comment, page URL, CSS selector and captured text, with no GitHub token and no automatic submission.",
+    "tradeoff": "Reviewers must review and submit each issue themselves and need permission to create issues; submitted issues are not synced back onto the page, and selectors can go stale when the page structure changes.",
+    "limitation": "There is no test runner or build tooling, so validation is a syntax check plus manual browser testing; notes inside iframes or shadow DOM are not supported, and saves from multiple tabs overwrite each other."
+  },
+  "evidence": {
+    "level": "working-demo",
+    "links": [
+      {
+        "label": "Latest commit",
+        "url": "https://github.com/yorkerhodes3/webpage-note/commit/cc00f0167ad3f8b0ec4d5ffa676e19c1d96f64f8",
+        "date": "2026-10-31"
+      },
+      {
+        "label": "README",
+        "url": "https://github.com/yorkerhodes3/webpage-note#readme",
+        "date": "2026-10-31"
+      }
+    ]
+  },
+  "links": {
+    "source": "https://github.com/yorkerhodes3/webpage-note"
+  },
+  "images": [
+    {
+      "id": "right-click-note",
+      "src": ".portfolio/right-click-note.webp",
+      "alt": "Document excerpt card titled Reviewing and publishing, quoting the README: right-click an element to write a comment, optionally selecting text first to capture it.",
+      "caption": "The core interaction: a note is pinned to the element or text a reviewer right-clicks.",
+      "credit": "Excerpt from the webpage-note README",
+      "source": "README excerpt"
+    },
+    {
+      "id": "opt-in-widget",
+      "src": ".portfolio/opt-in-widget.webp",
+      "alt": "Document excerpt card titled An opt-in page widget, quoting the README: copy webpage-note.js into your website repository and include it in your HTML, with no dependencies or build step.",
+      "caption": "Adoption is a single script tag, and the widget stays off unless a site enables it.",
+      "credit": "Excerpt from the webpage-note README",
+      "source": "README excerpt"
+    },
+    {
+      "id": "local-overlays",
+      "src": ".portfolio/local-overlays.webp",
+      "alt": "Document excerpt card titled webpage-note, quoting the README: annotations are local overlays, not edits to the deployed HTML, and only submitted GitHub issues are shared with other reviewers or Copilot.",
+      "caption": "Nothing is published until a reviewer submits the issue, which Copilot can then turn into a pull request.",
+      "credit": "Excerpt from the webpage-note README",
+      "source": "README excerpt"
+    }
+  ],
+  "defaultImageId": "right-click-note"
+}
